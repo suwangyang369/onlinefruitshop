@@ -7,3 +7,5 @@
 #使用工具 eclpise，mysql
 
 #使用框架 ajax+javascript+Spring+SpringMVC
+
+#数据库文件 在文件夹dbscripts里面
