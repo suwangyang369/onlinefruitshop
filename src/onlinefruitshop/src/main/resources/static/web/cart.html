@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<meta charset="utf-8" />
+		<title>128水果店</title>
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/cart.css" />
+	</head>
+
+	<body>
+		<!--头部-->
+		<header class="header">
+			
+			<div class="col-md-3">
+				<a href="index.html">
+					<img src="../images/index/222.png" />
+				</a>
+			</div>
+			<!--快捷选项-->
+			<div class="col-md-9 top-item">
+
+				<ul class="list-inline" style="float: right;">
+
+					
+					<li><a href="cart.html"><span class="fa fa-cart-plus"></span>&nbsp;订单</a></li>
+	
+					
+					<li class="li-split">|</li>
+					<li><a href="login.html"><span class="fa fa-user"></span>&nbsp;登录</a></li>
+
+				</ul>
+
+			</div>
+
+		</header>
+		<!--头部结束-->
+		<!--导航 -->
+		<!--分割导航和顶部-->
+		<div class="clearfix"></div>
+		<hr />
+		<div class="col-md-12 top-nav">
+			
+			<div class="col-md-6">
+
+				<form action="cart.html" class="form-inline" role="form" style="float: right;">
+					<div class="form-group">
+						<input type="text" class="form-control" id="search" name="search" placeholder="请输入商品名称进行搜索">
+					</div>
+
+					<button type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
+				</form>
+
+			</div>
+		</div>
+		<!--导航结束-->
+
+		<div class="col-md-offset-1 col-md-10">
+
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title"><span class="fa fa-shopping-cart"></span> 订单</h3>
+				</div>
+				<div class="panel-body">
+					<form action="cart.html" role="form">
+						
+						<table class="cart-table" width="100%">
+							<thead>
+								<tr>
+									<th width="8%">
+										<input type="checkbox" class="ckall" onclick="checkall(this)" />全选</th>
+									<th width="110"></th>
+									<th width="29%">商品</th>
+									<th width="11%">单价</th>
+									<th width="15%">数量</th>
+									<th width="11%">金额</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody id="cart-list" class="cart-body">
+								
+							</tbody>
+						</table>
+						<div id="fenye" style="text-align: center;"></div>
+						<div class="total-bar">
+							<a href="javascript:selDelCart()" class="cart-del-sel btn btn-default btn-xs">删除所选商品</a>
+							
+
+						</div>
+						<div>
+							<span class="pull-right">
+								<input type="submit" value=" 刷新订单  " class="btn btn-primary btn-lg link-account" />
+							</span>
+						</div>
+
+					</form>
+				</div>
+			</div>
+
+		</div>
+
+		
+	<script type="text/javascript">
+	var list = null;
+	var yeshu = 0;
+	
+	$(document).ready(function() {
+		showCartList();
+	});
+	
+	function showCartList() {
+		$.ajax({
+			"url":"/carts/",
+			"type":"GET",
+			"dataType":"json",
+			"success":function(json) {
+				if (json.state == 200) {
+					list = json.data;
+					
+					var but = "";
+					$("#cart-list").empty();
+					for (var i = 0; i < 2; i++) {
+						console.log(list[i].title);
+						var html = '<tr>'
+							+ '<td><input name="cids" value="#{cid}" type="checkbox" class="ckitem" /></td>'
+							+ '<td><img src="..#{image}collect.jpg" width="110" /></td>'
+							+ '<td>#{title}</td>'
+							+ '<td>￥<span id="price-#{cid}">#{price}</span></td>'
+							+ '<td>'
+							+ '<input type="button" value="-" class="num-btn" onclick="reduceNum(#{cid})" />'
+							+ '<input id="num-#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">'
+							+ '<input class="num-btn" type="button" value="+" onclick="addNum(#{cid})" />'
+							+ '</td>'
+							+ '<td>￥<span id="total-price-#{cid}">#{totalPrice}</span></td>'
+							+ '<td><input type="button" onclick="delCartItem(this)" class="cart-del btn btn-default btn-xs" value="删除"/></td>'
+							+ '</tr>';
+								
+						html = html.replace(/#{cid}/g, list[i].cid);
+						html = html.replace(/#{image}/g, list[i].image);	
+						html = html.replace(/#{title}/g, list[i].title);	
+						html = html.replace(/#{price}/g, list[i].price);	
+						html = html.replace(/#{num}/g, list[i].num);	
+						html = html.replace(/#{totalPrice}/g, list[i].price * list[i].num);	
+								
+						$("#cart-list").append(html);
+					}
+					if(list.length%2!=0){
+						yeshu = (list.length/2)+1;
+					}else{
+						yeshu = (list.length/2);
+					}
+					for (var i = 1;i<=yeshu;i++) {
+						but += "<input style='margin-right: 10px;' id='fenye_"+i+"' type='button' value="+i+" onclick='nex("+i+")'/>";
+					}
+					$("#fenye").append(but);
+					if(yeshu>0){
+						document.getElementById("fenye_1").setAttribute('style','background-color: #DDDDDD;margin-right: 10px;');
+					}
+				} else {
+					alert(json.message);
+				}
+			}
+		});
+	}
+	
+	function nex(ye)
+	{
+		$("#cart-list").empty();
+		for (var i = 2*(ye-1); i <ye*2; i++) {
+			console.log(list[i].title);
+			var html = '<tr>'
+					+ '<td><input name="cids" value="#{cid}" type="checkbox" class="ckitem" /></td>'
+					+ '<td><img src="..#{image}collect.jpg" width="110" /></td>'
+					+ '<td>#{title}</td>'
+					+ '<td>￥<span id="price-#{cid}">#{price}</span></td>'
+					+ '<td>'
+					+ '<input type="button" value="-" class="num-btn" onclick="reduceNum(#{cid})" />'
+					+ '<input id="num-#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">'
+					+ '<input class="num-btn" type="button" value="+" onclick="addNum(#{cid})" />'
+					+ '</td>'
+					+ '<td>￥<span id="total-price-#{cid}">#{totalPrice}</span></td>'
+					+ '<td><input type="button" onclick="delCartItem(this)" class="cart-del btn btn-default btn-xs" value="删除"/></td>'
+					+ '</tr>';
+								
+			html = html.replace(/#{cid}/g, list[i].cid);
+			html = html.replace(/#{image}/g, list[i].image);	
+			html = html.replace(/#{title}/g, list[i].title);	
+			html = html.replace(/#{price}/g, list[i].price);	
+			html = html.replace(/#{num}/g, list[i].num);	
+			html = html.replace(/#{totalPrice}/g, list[i].price * list[i].num);	
+			
+			$("#cart-list").append(html);
+		}
+		for(var j = 1;j<=yeshu ;j++){
+			document.getElementById("fenye_"+j).setAttribute('style','background-color: #DDDDDD;margin-right: 10px;');
+		}
+		document.getElementById("fenye_"+ye).setAttribute('style','background-color: #DDDDDD;margin-right: 10px;');
+				
+	}
+	
+	
+	
+	
+	
+	function reduceNum(cid) {
+		if( parseInt($("#num-" + cid).val())>1){
+		$.ajax({
+			"url":"/carts/" + cid + "/sub_num",
+			"type":"POST",
+			"dataType":"json",
+			
+			
+			"success":function(json) {		
+				
+				if (json.state == 200) {
+					// showCartList();
+					
+					var n = parseInt($("#num-" + cid).val()) - 1;
+					$("#num-" + cid).val(n);
+					var tp = parseInt($("#price-" + cid).html()) * n;
+					$("#total-price-" + cid).html(tp);
+					
+				} else {
+					alert(json.message);
+				}
+			},
+			"error":function() {
+				alert("您的登录信息已经过期，请重新登录！");
+				location.href = "login.html";
+			}
+		});
+	}
+	}	
+	function addNum(cid) {
+		$.ajax({
+			"url":"/carts/" + cid + "/add_num",
+			"type":"POST",
+			"dataType":"json",
+			"success":function(json) {
+				if (json.state == 200) {
+					// showCartList();
+					var n = parseInt($("#num-" + cid).val()) + 1;
+					$("#num-" + cid).val(n);
+					var tp = parseInt($("#price-" + cid).html()) * n;
+					$("#total-price-" + cid).html(tp);
+				} else {
+					alert(json.message);
+				}
+			},
+			"error":function() {
+				alert("您的登录信息已经过期，请重新登录！");
+				location.href = "login.html";
+			}
+		});
+	}
+
+	</script>
+	</body>
+
+</html>
+
+
+
+
+
+
+
+
+

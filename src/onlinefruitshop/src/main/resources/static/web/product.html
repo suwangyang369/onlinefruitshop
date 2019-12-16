@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<meta charset="utf-8" />
+		<title>128水果商城</title>
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/product.css" />
+		<link rel="stylesheet" type="text/css" href="../css/imgmove.css" />
+		<script src="../js/product.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/imgmove.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<!--头部-->
+		<header class="header">
+			
+			<div class="col-md-3">
+				<a href="index.html">
+					<img src="../images/index/222.png" />
+				</a>
+			</div>
+			<!--快捷选项-->
+			<div class="col-md-9 top-item">
+
+				<ul class="list-inline" style="float: right;">
+
+					
+					<li><a href="cart.html"><span class="fa fa-cart-plus"></span>&nbsp;订单</a></li>
+				
+					
+					<li class="li-split">|</li>
+					<li><a href="login.html"><span class="fa fa-user"></span>&nbsp;登录</a></li>
+
+				</ul>
+
+			</div>
+
+		</header>
+	
+		<div class="clearfix"></div>
+		<hr />
+	
+			<div class="col-md-6">
+
+				<form action="search.html" class="form-inline" role="form" style="float: right;">
+					<div class="form-group">
+						<input type="text" class="form-control" id="search" name="search" placeholder="请输入商品名称进行搜索">
+					</div>
+
+					<button type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
+				</form>
+
+			</div>
+		
+		
+		<div class="col-md-offset-1 col-md-10">
+			<div class="col-md-6" id="goods-images">
+
+			<div data="1" class="img-big move-img col-md-12">
+				<img id="goods-image-1-small" width="70%" />
+			</div>
+			<!--
+				<div data="1" class="col-md-2 img-small" >
+					<img id="goods-image-1-small" width="500%" />
+			
+					</div>
+				-->	
+				
+			</div>
+
+			<div class="col-md-6">
+				<h3 id="goods-title" class="col-md-12 title-row-1"></h3>
+				<h4 class="col-md-12 text-row-1"><small id="goods-sell-point"></small></h4>
+				<div class="col-md-12 price-bar">
+					<small>售价：</small> ¥<span id="goods-price"></span>.00
+					<div><small>*退货补运费 *7天无理由退货 *24小时快速退款 </small></div>
+				</div>
+				<form class="form-inline product-form col-md-12" role="form">
+					<div class="col-md-12 form-space">
+						<label for="num">数量：</label>
+						<input id="numDown" type="button" value="-" class="num-btn" onclick="sub()"/>
+						<input id="num" type="text" size="2" readonly="readonly" class="num-text" value="1">
+						<input id="numUp"class="num-btn" type="button" value="+" onclick="add()"/>
+						<input id="hi" type="hidden" value="0">
+						
+					</div>
+					
+					
+					<div class="col-md-12 form-space">
+
+						<button id="btn-add" type="button" class="btn btn-default ''"><span class="fa fa-cart-plus"></span>购买</button>
+
+						
+
+					</div>
+				</form>
+
+			</div>
+
+		</div>
+		<!--商品信息展示结束-->
+		
+
+	<script type="text/javascript">
+	var id;
+	$(document).ready(function(){
+		  var s =  location.href;
+s=s.split('?');//分割
+		id = s[1].substr(3,s[1].length-1);
+		$.ajax({
+			"url":"/goods/" + id + "/details",
+			"type":"GET",
+			"dataType":"json",
+			"success":function(json) {
+				if (json.state == 200) {
+					// 将服务器响应的数据显示到页面中
+					$("#goods-title").html(json.data.title);
+					$("#goods-price").html(json.data.price);
+				$("#goods-sell-point").html(json.data.sellPoint);
+					document.getElementById("hi").value=json.data.price;
+					$("#goods-image-1-big").attr("src", ".." + json.data.image + "1_big.png");
+					$("#goods-image-2-big").attr("src", ".." + json.data.image + "2_big.png");
+					$("#goods-image-3-big").attr("src", ".." + json.data.image + "3_big.png");
+					$("#goods-image-4-big").attr("src", ".." + json.data.image + "4_big.png");
+					$("#goods-image-5-big").attr("src", ".." + json.data.image + "5_big.png");
+					$("#goods-image-1-small").attr("src", ".." + json.data.image + "1.jpg");
+					$("#goods-image-2-small").attr("src", ".." + json.data.image + "2.jpg");
+					$("#goods-image-3-small").attr("src", ".." + json.data.image + "3.jpg");
+					$("#goods-image-4-small").attr("src", ".." + json.data.image + "4.jpg");
+					$("#goods-image-5-small").attr("src", ".." + json.data.image + "5.jpg");
+					
+				} else {
+					alert(json.message);
+				}
+			}
+		});
+	});
+	function add()
+	{
+		var hi=document.getElementById("hi");
+		var pri = document.getElementById("goods-price");
+		var count = document.getElementById("num");
+		count.value=parseInt(count.value)+1;
+		var jg =parseFloat(hi.value)*parseInt(count.value);
+		pri.innerText = jg;
+		count.value=parseInt(count.value)-1;
+	}
+	function sub()
+	{
+		var hi=document.getElementById("hi");
+		var pri = document.getElementById("goods-price");
+		var count = document.getElementById("num");
+		if(count.value>1)
+		{
+		count.value=parseInt(count.value)-1;
+		var jg =parseFloat(hi.value)*parseInt(count.value);
+		pri.innerText = jg;
+		count.value=parseInt(count.value)+1;
+		}
+	}
+	
+	$("#btn-add").click(function(){
+		$.ajax({
+			"url":"/carts/add",
+			"data":"gid=" + id + "&num=" + $("#num").val(),
+			"type":"POST",
+			"dataType":"json",
+			"success":function(json) {
+				if (json.state == 200) {
+					alert("购买成功！");
+				} else {
+					alert("购买失败！");
+					alert(json.message);
+				}
+			},
+			"error":function() {
+			alert("您还没有登录，或登录信息已经过期，请重新登录！");
+			location.href = "login.html";
+			}
+		});
+	});
+	$("#btn-addd").click(function(){
+		$.ajax({
+			"url":"/carts/add",
+			"data":"gid=" + id + "&num=" + $("#num").val(),
+			"type":"POST",
+			"dataType":"json",
+			"success":function(json) {
+				if (json.state == 200) {
+					alert("购买成功！");
+				} else {
+					alert("购买失败！");
+					alert(json.message);
+				}
+			},
+			"error":function() {
+			alert("您还没有登录，或登录信息已经过期，请重新登录！");
+			location.href = "login.html";
+			}
+		});
+	});
+	</script>
+	</body>
+
+</html>
