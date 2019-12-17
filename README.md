@@ -2,7 +2,7 @@
 
 #项目名称 网上水果商店
 
-#版本类型 Java
+#版本类型 Java web版
 
 #使用工具 eclpise，mysql
 
